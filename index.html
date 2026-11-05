@@ -718,7 +718,9 @@ $("btnBackFromLegal").addEventListener("click", () => {
    LOGIN
    ============================================================ */
 $("acceptTerms").addEventListener("change", () => {
-  $("btnLogin").disabled = !$("acceptTerms").checked;
+  const accepted = $("acceptTerms").checked;
+  $("btnLogin").disabled = !accepted;
+  if ($("btnGoogleLogin")) $("btnGoogleLogin").disabled = !accepted || !supabaseClient;
 });
 let supabaseClient = null;
 let authSession = null;
