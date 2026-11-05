@@ -762,7 +762,7 @@ $("btnGoogleLogin").addEventListener("click", async () => {
   $("authStatus").textContent = "Redirecionando para autenticação Google…";
   const { error } = await supabaseClient.auth.signInWithOAuth({
     provider:"google",
-    options:{ redirectTo:window.location.href.split("#")[0], queryParams:{ access_type:"offline", prompt:"select_account" } }
+    options:{ redirectTo:"https://lima-virtual-pro.github.io/Lima-Redator-Inteligente/", queryParams:{ access_type:"offline", prompt:"select_account" } }
   });
   if (error) { $("authStatus").textContent = "Falha no login: " + error.message; $("btnGoogleLogin").disabled=false; }
 });
