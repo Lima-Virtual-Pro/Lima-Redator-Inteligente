@@ -720,7 +720,9 @@ $("btnBackFromLegal").addEventListener("click", () => {
 $("acceptTerms").addEventListener("change", () => {
   const accepted = $("acceptTerms").checked;
   $("btnLogin").disabled = !accepted;
-  if ($("btnGoogleLogin")) $("btnGoogleLogin").disabled = !accepted || !supabaseClient;
+  // O botão fica clicável após o aceite; o próprio clique informa se o SDK
+  // do Supabase não carregou, em vez de parecer que está travado.
+  if ($("btnGoogleLogin")) $("btnGoogleLogin").disabled = !accepted;
 });
 let supabaseClient = null;
 let authSession = null;
@@ -756,8 +758,8 @@ if (supabaseConfigured()) {
   });
 } else {
   $("authStatus").textContent = "Supabase ainda não configurado. O modo local permanece disponível.";
-  $("btnGoogleLogin").disabled = true;
-  $("btnGoogleLogin").title = "Configure LIMA_CONFIG para habilitar o Google.";
+  $("btnGoogleLogin").disabled = !$("acceptTerms").checked;
+  $("btnGoogleLogin").title = "O login Google depende do carregamento do Supabase.";
 }
 $("btnGoogleLogin").addEventListener("click", async () => {
   if (!$("acceptTerms").checked) { alert("Aceite os Termos de Uso e a Política de Privacidade para continuar."); return; }
