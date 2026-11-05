@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lima — Redator Inteligente</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%2322D3EE%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230E7490%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2226%22%20fill%3D%22%230B1120%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%225%22%20width%3D%2290%22%20height%3D%2290%22%20rx%3D%2223%22%20fill%3D%22url%28%23g%29%22%2F%3E%3Cpath%20d%3D%22M19%2034c12-6%2022-4%2031%204v38c-9-8-19-10-31-4V34Z%22%20fill%3D%22none%22%20stroke%3D%22%23F8FAFC%22%20stroke-width%3D%225%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M81%2034c-12-6-22-4-31%204v38c9-8%2019-10%2031-4V34Z%22%20fill%3D%22none%22%20stroke%3D%22%23F8FAFC%22%20stroke-width%3D%225%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22m62%2024%2011%2011-23%2023-12%203%203-12%2021-25Z%22%20fill%3D%22%23FBBF24%22%20stroke%3D%22%230B1120%22%20stroke-width%3D%222%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22m38%2061-3%2012%2012-3%22%20fill%3D%22%23FBBF24%22%2F%3E%3C%2Fsvg%3E" />
+<style>
+  /* =========================================
+     DESIGN SYSTEM & VARIÁVEIS
+     ========================================= */
+  :root {
+    --bg-main: #0B1120;
+    --bg-panel: #1E293B;
+    --bg-input: #0F172A;
+    --bg-hover: #334155;
+    
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    
+    --accent: #0EA5E9;
+    --accent-hover: #0284C7;
+    --accent-light: rgba(14, 165, 233, 0.15);
+    
+    --success: #10B981;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --danger: #EF4444;
+    --danger-bg: rgba(239, 68, 68, 0.1);
+    --warning: #F59E0B;
+    --warning-bg: rgba(245, 158, 11, 0.1);
+    
+    --border: #334155;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    --glow: 0 0 15px rgba(14, 165, 233, 0.3);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* =========================================
+     HEADER & LOGO
+     ========================================= */
+  header {
+    background-color: var(--bg-panel);
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .brand-logo svg {
+    display: block;
+    height: 42px;
+    width: auto;
+    filter: drop-shadow(0 3px 10px rgba(34, 211, 238, 0.10));
+  }
+  .badge {
+    background-color: var(--warning-bg);
+    color: var(--warning);
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+  .user-info {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .user-info strong { color: var(--text-main); }
+
+  /* =========================================
+     LAYOUT & CARDS
+     ========================================= */
+  main {
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+  .screen { display: none; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; }
+  
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card {
+    background-color: var(--bg-panel);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* =========================================
+     TIPOGRAFIA & FORMULÁRIOS
+     ========================================= */
+  h2 { margin-top: 0; font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 16px; letter-spacing: -0.5px; }
+  h3 { font-size: 1.1rem; margin: 20px 0 10px; color: var(--text-main); }
+  p { margin: 0 0 16px 0; color: var(--text-muted); }
+  .muted { color: var(--text-muted); font-size: 0.9rem; }
+
+  label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin: 16px 0 6px; }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: var(--bg-input);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+  textarea { resize: vertical; min-height: 240px; line-height: 1.6; }
+
+  /* =========================================
+     BOTÕES
+     ========================================= */
+  button {
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background-color: var(--accent);
+    color: #fff;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  button:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+    box-shadow: var(--glow);
+    transform: translateY(-1px);
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  button.secondary {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+  }
+  button.secondary:hover {
+    background-color: var(--bg-hover);
+    box-shadow: none;
+  }
+  button.ghost {
+    background-color: transparent;
+    color: var(--accent);
+    padding: 8px 12px;
+  }
+  button.ghost:hover {
+    background-color: var(--accent-light);
+    box-shadow: none;
+  }
+  button.small { padding: 6px 12px; font-size: 0.8rem; border-radius: var(--radius-sm); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* =========================================
+     COMPONENTES ESPECÍFICOS
+     ========================================= */
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row > * { flex: 1; min-width: 240px; }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .tab {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .tab.active { background-color: var(--accent-light); color: var(--accent); }
+  .tab:hover:not(.active) { background-color: var(--bg-hover); color: var(--text-main); }
+
+  /* Upload Dropzone */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .dropzone:hover, .dropzone.over {
+    border-color: var(--accent);
+    background-color: var(--accent-light);
+    color: var(--text-main);
+  }
+  .dropzone strong { display: block; margin-bottom: 8px; font-size: 1.1rem; color: var(--text-main); }
+  .dropzone small { font-size: 0.85rem; }
+  .file-label { display: inline-block; margin-top: 12px; font-weight: 600; color: var(--accent); cursor: pointer; }
+  .file-label:hover { text-decoration: underline; }
+
+  /* Resultados */
+  .score-box {
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-input) 100%);
+    padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border);
+  }
+  .score-number { font-size: 3.5rem; font-weight: 800; color: var(--accent); line-height: 1; letter-spacing: -1px; }
+  .score-max { font-size: 1rem; color: var(--text-muted); font-weight: 500; }
+  
+  .bar { height: 10px; background-color: var(--bg-hover); border-radius: 999px; overflow: hidden; flex: 1; min-width: 150px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #38BDF8); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+  
+  .crit { margin-bottom: 16px; }
+  .crit-head { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; font-weight: 600; }
+  
+  .strength, .weakness, .suggestion { padding: 16px; border-radius: var(--radius-md); margin-bottom: 12px; font-size: 0.95rem; border: 1px solid transparent; }
+  .strength { background-color: var(--success-bg); border-color: rgba(16, 185, 129, 0.2); border-left: 4px solid var(--success); }
+  .weakness { background-color: var(--danger-bg); border-color: rgba(239, 68, 68, 0.2); border-left: 4px solid var(--danger); }
+  .suggestion { background-color: var(--accent-light); border-color: rgba(14, 165, 233, 0.2); border-left: 4px solid var(--accent); }
+  .strength strong, .weakness strong, .suggestion strong { display: block; margin-bottom: 4px; color: var(--text-main); }
+  .quote { font-style: italic; color: var(--text-muted); margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--border); }
+
+  /* Alertas */
+  .alert { padding: 12px 16px; border-radius: var(--radius-md); font-size: 0.9rem; margin: 16px 0; border: 1px solid transparent; }
+  .alert.err { background-color: var(--danger-bg); border-color: rgba(239, 68, 68, 0.3); color: #FCA5A5; }
+  .alert.ok { background-color: var(--success-bg); border-color: rgba(16, 185, 129, 0.3); color: #6EE7B7; }
+  .alert.warn { background-color: var(--warning-bg); border-color: rgba(245, 158, 11, 0.3); color: #FCD34D; }
+  .disclaimer { font-size: 0.8rem; color: var(--text-muted); margin-top: 16px; padding: 12px; background-color: var(--bg-input); border-radius: var(--radius-md); border: 1px solid var(--border); }
+
+  /* Tabela de Histórico */
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  tr:hover { background-color: var(--bg-input); }
+
+  /* Área Legal */
+  .legal { max-height: 60vh; overflow-y: auto; padding-right: 16px; margin-top: 16px; }
+  .legal h3 { margin-top: 24px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .legal p, .legal li { color: var(--text-muted); font-size: 0.95rem; }
+  .legal ul { padding-left: 20px; margin-bottom: 16px; }
+  
+  /* Checkbox Customizado */
+  .check { display: flex; align-items: flex-start; gap: 12px; margin: 20px 0; font-size: 0.9rem; }
+  .check input[type="checkbox"] {
+    width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: var(--accent);
+  }
+  .check label { margin: 0; color: var(--text-muted); font-weight: normal; cursor: pointer; }
+  .link-btn {
+    background: none; border: none; padding: 0; color: var(--accent); text-decoration: none; font-weight: 600; cursor: pointer; font-size: inherit; font-family: inherit;
+  }
+  .link-btn:hover { text-decoration: underline; box-shadow: none; transform: none; }
+
+  /* =========================================
+     LOGIN ESPECÍFICO
+     ========================================= */
+  .login-container { max-width: 440px; margin: 40px auto; }
+  .login-logo { display: block; margin: 0 auto 24px; height: 104px; width: auto; filter: drop-shadow(0 8px 22px rgba(34, 211, 238, 0.10)); }
+  .login-header { text-align: center; margin-bottom: 32px; }
+  .login-header h2 { font-size: 1.6rem; margin-bottom: 8px; }
+  .login-header p { font-size: 0.95rem; }
+
+  /* Skip Link */
+  .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: #fff; padding: 12px 24px; z-index: 999; border-radius: 0 0 8px 0; text-decoration: none; font-weight: 600; }
+  .skip-link:focus { left: 0; }
+
+  /* =========================================
+     IMPRESSÃO (PDF)
+     ========================================= */
+  @media print {
+    @page { size: A4; margin: 20mm; }
+    body { background: #fff !important; color: #111 !important; display: block !important; }
+    header, footer, .actions, .tabs, .skip-link, #teacherCard, #screen-login, #screen-editor, #screen-history, #screen-legal, .no-print { display: none !important; }
+    #screen-result { display: block !important; }
+    #screen-result .card { background: #fff !important; border: 1px solid #ddd !important; box-shadow: none !important; padding: 20px !important; }
+    #screen-result h2 { color: #0EA5E9 !important; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
+    .score-box { background: #f8fafc !important; border: 1px solid #ddd; }
+    .score-number { color: #0EA5E9 !important; }
+    .bar { background: #e2e8f0 !important; }
+    .bar > i { background: #0EA5E9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .strength { background: #f0fff4 !important; border-left-color: #16a34a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .weakness { background: #fef2f2 !important; border-left-color: #dc2626 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .suggestion { background: #eff6ff !important; border-left-color: #2563eb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .muted, .quote { color: #555 !important; }
+    .disclaimer { background: #f8fafc !important; border: 1px solid #ddd; color: #333 !important; }
+    .print-header { display: block !important; margin-bottom: 24px; border-bottom: 2px solid #0EA5E9; padding-bottom: 12px; }
+    .print-header .print-logo { height: 48px; width: auto; display: block; margin-bottom: 12px; }
+  }
+  .print-header { display: none; }
+
+  /* Responsividade */
+  @media (max-width: 600px) {
+    main { padding: 16px; }
+    .card { padding: 20px; }
+    .score-number { font-size: 2.5rem; }
+    .brand-logo svg { height: 32px; }
+    .user-info { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
+
+<!-- =========================================
+     BIBLIOTECA SVG — IDENTIDADE VISUAL LIMA
+     Livro aberto + pena de escrita + ponto de luz
+     ========================================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="lima-mark-gradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22D3EE" />
+      <stop offset="100%" stop-color="#0E7490" />
+    </linearGradient>
+    <linearGradient id="lima-pen-gradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FDE68A" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <symbol id="lima-symbol" viewBox="0 0 100 100">
+      <rect x="3" y="3" width="94" height="94" rx="25" fill="#0B1120" />
+      <rect x="7" y="7" width="86" height="86" rx="22" fill="url(#lima-mark-gradient)" />
+      <path d="M18 37c11-6 21-4 32 4v35c-10-8-21-10-32-5V37Z" fill="none" stroke="#F8FAFC" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M82 37c-11-6-21-4-32 4v35c10-8 21-10 32-5V37Z" fill="none" stroke="#F8FAFC" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="m63 19 13 13-24 24-13 4 4-13 20-28Z" fill="url(#lima-pen-gradient)" stroke="#0B1120" stroke-width="2.8" stroke-linejoin="round" />
+      <path d="m39 60-3 12 12-4" fill="#FDE68A" />
+      <path d="m76 15 2.5-6 2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5Z" fill="#FDE68A" />
+    </symbol>
+    <symbol id="lima-lockup" viewBox="0 0 400 100">
+      <use href="#lima-symbol" x="0" y="0" width="100" height="100" />
+      <text x="119" y="55" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="43" font-weight="850" fill="#F8FAFC" letter-spacing="-1.8">Lima</text>
+      <rect x="121" y="66" width="28" height="3" rx="1.5" fill="#22D3EE" />
+      <text x="121" y="84" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#A5F3FC" letter-spacing="2.25">REDATOR INTELIGENTE</text>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- =========================================
+     HEADER
+     ========================================= -->
+<header>
+  <a class="brand-logo" href="#" aria-label="Lima — Redator Inteligente, ir para o início">
+    <svg viewBox="0 0 380 100" role="img" aria-label="Lima — Redator Inteligente"><use href="#lima-lockup"/></svg>
+  </a>
+  <div class="user-info" id="userInfo" aria-live="polite">Desconectado</div>
+</header>
+
+<main id="main">
+
+  <!-- ============ LOGIN ============ -->
+  <section class="screen active" id="screen-login" aria-labelledby="login-title">
+    <div class="card login-container">
+      <svg class="login-logo" viewBox="0 0 380 100" role="img" aria-label="Lima — Redator Inteligente"><use href="#lima-lockup"/></svg>
+      
+      <div class="login-header">
+        <h2 id="login-title">Bem-vindo(a)</h2>
+        <p>Acesse sua conta para começar a escrever.</p>
+      </div>
+
+      <label for="loginName">Nome</label>
+      <input id="loginName" type="text" placeholder="Ex.: Ana Silva" autocomplete="name" />
+      
+      <label for="loginRole">Perfil de acesso</label>
+      <select id="loginRole">
+        <option value="student">Estudante</option>
+        <option value="teacher">Professor</option>
+      </select>
+      
+      <div class="check">
+        <input type="checkbox" id="acceptTerms" />
+        <label for="acceptTerms">Li e aceito os <button class="link-btn" data-legal="terms">Termos de Uso</button> e a <button class="link-btn" data-legal="privacy">Política de Privacidade</button>.</label>
+      </div>
+      
+      <div class="actions">
+        <button id="btnLogin" disabled style="width: 100%;">Entrar no Sistema</button>
+      </div>
+      
+      <div class="disclaimer">
+        <strong>Importante:</strong> com a conta Google conectada e o serviço configurado, a redação será enviada ao serviço de IA para avaliação aprofundada. No modo local, são usados apenas indicadores textuais. Em ambos os casos, a devolutiva é orientativa e requer revisão humana.
+      </div>
+      <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 16px;">
+        © Nailson Lima · Lima — Redator Inteligente.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EDITOR ============ -->
+  <section class="screen" id="screen-editor" aria-labelledby="editor-title">
+    <div class="card">
+      <h2 id="editor-title">Nova redação</h2>
+      <div class="tabs" role="tablist" aria-label="Modo de entrada">
+        <button class="tab active" role="tab" id="tab-editor" aria-selected="true" aria-controls="pane-editor" tabindex="0" data-tab="editor">✏️ Escrever no app</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="pane-upload" tabindex="-1" data-tab="upload">📤 Enviar arquivo</button>
+      </div>
+
+      <div id="pane-editor" role="tabpanel" aria-labelledby="tab-editor">
+        <div class="row">
+          <div>
+            <label for="fmt">Formato da redação</label>
+            <select id="fmt">
+              <option value="dissertativa-argumentativa">Dissertativa-argumentativa</option>
+              <option value="dissertativa">Dissertativa</option>
+              <option value="narrativa">Narrativa</option>
+              <option value="descritiva">Descritiva</option>
+            </select>
+          </div>
+          <div>
+            <label for="theme">Tema (opcional)</label>
+            <input id="theme" type="text" placeholder="Ex.: Desafios da mobilidade urbana" />
+          </div>
+        </div>
+        <label for="essay">Texto</label>
+        <textarea id="essay" placeholder="Escreva ou cole seu texto aqui…" aria-describedby="essayHelp"></textarea>
+        <div class="muted" id="essayHelp"><span id="charCount">0</span> caracteres · <span id="wordCountLive">0</span> palavras · máx. 10.000 caracteres</div>
+        <div class="muted" id="draftStatus" role="status" aria-live="polite">Rascunho salvo automaticamente neste navegador.</div>
+        <div class="actions">
+          <button class="secondary" id="btnGenerate">✨ Gerar exemplo</button>
+          <button class="ghost" id="btnClearDraft" type="button">Limpar rascunho</button>
+          <button id="btnEvaluateEditor">🔍 Analisar redação</button>
+        </div>
+      </div>
+
+      <div id="pane-upload" class="hidden" role="tabpanel" aria-labelledby="tab-upload">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Selecionar ou arrastar arquivo para upload">
+          <strong>Arraste um arquivo aqui ou clique para selecionar</strong>
+          <small>TXT, DOCX, PDF (nativo ou escaneado), PNG, JPG · máx. 5 MB</small>
+        </div>
+        <label class="file-label" for="fileInput">Ou selecione pelo botão</label>
+        <input type="file" id="fileInput" accept=".txt,.docx,.pdf,.png,.jpg,.jpeg" class="hidden" />
+        <div id="uploadStatus" aria-live="polite"></div>
+        <label for="uploadedText">Texto extraído (editável antes de analisar)</label>
+        <textarea id="uploadedText" placeholder="O texto extraído aparecerá aqui…"></textarea>
+        <div class="muted" id="uploadedMeta"></div>
+        <div class="actions"><button id="btnEvaluateUpload">🔍 Analisar redação enviada</button></div>
+      </div>
+
+      <label for="rubric" style="margin-top:24px;">Critérios de Avaliação (Rubrica)</label>
+      <select id="rubric"></select>
+      <div id="rubricInfo" class="muted" style="margin-top:8px;"></div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTADO ============ -->
+  <section class="screen" id="screen-result" aria-labelledby="result-title">
+    <div class="print-header" id="printHeader"></div>
+
+    <div class="card">
+      <h2 id="result-title">Resultado da análise</h2>
+      <div class="score-box">
+        <div>
+          <div class="score-number" id="scoreValue" aria-live="polite">--</div>
+          <div class="score-max">de 100 pontos</div>
+        </div>
+        <div class="bar" aria-hidden="true"><i id="scoreBar" style="width:0%"></i></div>
+        <div>
+          <div class="muted">Formato: <strong id="resFormat">—</strong></div>
+          <div class="muted">Fonte: <strong id="resSource">—</strong></div>
+          <div class="muted">Rubrica: <strong id="resRubric">—</strong></div>
+          <div class="muted">Tema: <strong id="resTheme">Não informado</strong></div>
+        </div>
+      </div>
+      <div class="disclaimer" id="aiDisclaimer">Análise automatizada por indicadores textuais locais. Revisão humana recomendada.</div>
+    </div>
+
+    <div class="card"><h2>Competências</h2><div id="criteriaList"></div></div>
+    <div class="card"><h2>Pontos fortes</h2><div id="strengthsList"></div></div>
+    <div class="card"><h2>Pontos a melhorar</h2><div id="weaknessesList"></div></div>
+    <div class="card"><h2>Sugestões</h2><div id="suggestionsList"></div></div>
+
+    <div class="card hidden" id="teacherCard">
+      <h2>Revisão do professor</h2>
+      <p class="muted">A nota automática é preservada para consulta. A nota do professor, se informada, prevalece no histórico.</p>
+      <label for="teacherScore">Nota do professor (0–100)</label>
+      <input id="teacherScore" type="number" min="0" max="100" step="0.1" />
+      <label for="teacherComment">Comentário</label>
+      <textarea id="teacherComment" style="min-height:100px;" placeholder="Observações pedagógicas…"></textarea>
+      <div class="actions"><button id="btnTeacherSave">Salvar revisão</button></div>
+      <div id="teacherStatus" aria-live="polite"></div>
+    </div>
+
+    <div class="actions no-print">
+      <button class="secondary" id="btnBackEditor">← Nova análise</button>
+      <button class="ghost" id="btnExportMD">⬇️ Exportar Markdown</button>
+      <button class="ghost" id="btnExportPDF">🖨️ Exportar PDF</button>
+      <button class="secondary" id="btnHistory">📚 Histórico</button>
+    </div>
+  </section>
+
+  <!-- ============ HISTÓRICO ============ -->
+  <section class="screen" id="screen-history" aria-labelledby="history-title">
+    <div class="card">
+      <h2 id="history-title">Histórico de Avaliações</h2>
+      <div id="historyTableWrap" aria-live="polite" style="overflow-x: auto;"><p class="muted">Nenhuma avaliação registrada.</p></div>
+      <div class="actions">
+        <button class="secondary" id="btnBackFromHistory">← Voltar</button>
+        <button class="ghost" id="btnClearHistory" style="color: var(--danger);">🗑️ Limpar histórico</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LEGAL ============ -->
+  <section class="screen" id="screen-legal" aria-labelledby="legal-title">
+    <div class="card">
+      <h2 id="legal-title" tabindex="-1">Documento legal</h2>
+      <div class="legal" id="legalContent"></div>
+      <div class="actions" style="border-top: 1px solid var(--border); padding-top: 20px;">
+        <button class="secondary" id="btnBackFromLegal">← Voltar</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer style="text-align: center; padding: 32px 20px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: auto;">
+  <div>© Nailson Lima · <strong>Lima — Redator Inteligente</strong>. Todos os direitos reservados.</div>
+  <div style="margin-top: 12px; display: flex; gap: 16px; justify-content: center;">
+    <button class="link-btn" data-legal="terms" style="font-size: 0.85rem;">Termos de Uso</button>
+    <span>·</span>
+    <button class="link-btn" data-legal="privacy" style="font-size: 0.85rem;">Política de Privacidade</button>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+
+/* ============================================================
+   MARCA + ESTADO
+   ============================================================ */
+// Configure somente a URL e a chave PUBLICÁVEL do Supabase. Nunca coloque service_role
+// nem OPENAI_API_KEY neste arquivo. A chave da OpenAI fica nos Secrets da Edge Function.
+const LIMA_CONFIG = {
+  supabaseUrl: "https://xacuawtdrdqjoyxmkykg.supabase.co",
+  supabaseAnonKey: "sb_publishable_qUzG5jwnLhnvl1Y_kjspBA_iOtQzR4C",
+  aiFunctionName: "essay-review",
+  localModeAllowed: true
+};
+const BRAND = { name: "Lima", tagline: "Redator Inteligente", full: "Lima — Redator Inteligente" };
+const COPYRIGHT = "© Nailson Lima · Lima — Redator Inteligente. Todos os direitos reservados.";
+const STORAGE_KEY = "redacao_plus_state_v1";
+const DRAFT_KEY = "lima_redator_draft_v1";
+const DEFAULT_RUBRICS = [
+  { id:"padrao-v1", name:"Rubrica padrão (5 competências)", owner:null, criteria:[
+    { name:"Domínio da norma culta", weight:0.20, description:"Gramática, ortografia, pontuação." },
+    { name:"Compreensão do tema", weight:0.20, description:"Aderência ao tema e ao formato." },
+    { name:"Argumentação", weight:0.25, description:"Coerência, progressão e defesa de ponto de vista." },
+    { name:"Coesão e coerência", weight:0.20, description:"Conectivos, paragrafação, referenciação." },
+    { name:"Proposta de intervenção", weight:0.15, description:"Solução viável, detalhada e respeitosa." }
+  ]},
+  { id:"narrativa-v1", name:"Rubrica narrativa", owner:null, criteria:[
+    { name:"Estrutura narrativa", weight:0.25, description:"Situação inicial, conflito, clímax, desfecho." },
+    { name:"Personagens e foco", weight:0.20, description:"Consistência e ponto de vista." },
+    { name:"Linguagem e estilo", weight:0.20, description:"Adequação vocabular e ritmo." },
+    { name:"Coesão e coerência", weight:0.20, description:"Encadeamento dos fatos." },
+    { name:"Criatividade", weight:0.15, description:"Originalidade e verossimilhança." }
+  ]}
+];
+function cloneRubrics(list){ return list.map(r => ({ id:r.id, name:r.name, owner:r.owner||null, criteria:r.criteria.map(c => ({...c})) })); }
+function isValidRubric(r){
+  return r && typeof r.id === "string" && typeof r.name === "string"
+    && Array.isArray(r.criteria) && r.criteria.length > 0
+    && r.criteria.every(c => c && typeof c.name === "string"
+      && typeof c.weight === "number" && c.weight >= 0 && c.weight <= 1
+      && typeof c.description === "string");
+}
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) throw new Error("empty");
+    const parsed = JSON.parse(raw);
+    const rubrics = Array.isArray(parsed.rubrics) ? parsed.rubrics.filter(isValidRubric) : [];
+    const evaluations = Array.isArray(parsed.evaluations) ? parsed.evaluations.filter(e =>
+      e && typeof e.id === "string" && typeof e.score === "number"
+      && typeof e.text === "string" && Array.isArray(e.criteria)) : [];
+    return {
+      user: parsed.user && parsed.user.name
+        ? { id:parsed.user.id || null, name:String(parsed.user.name).slice(0,80), email:parsed.user.email || "",
+            provider:parsed.user.provider === "google" ? "google" : "local",
+            role: parsed.user.role === "teacher" ? "teacher" : "student" }
+        : null,
+      rubrics: rubrics.length ? rubrics : cloneRubrics(DEFAULT_RUBRICS),
+      evaluations,
+      termsAcceptedAt: parsed.termsAcceptedAt || null
+    };
+  } catch (e) {
+    return { user:null, rubrics: cloneRubrics(DEFAULT_RUBRICS), evaluations: [], termsAcceptedAt: null };
+  }
+}
+let state = loadState();
+function saveState(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch (e) { console.warn("Falha ao salvar estado", e); }
+}
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sanitizeFileName = (n) => String(n||"").replace(/[\u0000-\u001F\u007F]/g,"").slice(0,200);
+const sanitizeText = (s) => String(s||"").replace(/\u0000/g,"").replace(/[\u0001-\u0008\u000B\u000C\u000E-\u001F]/g,"").slice(0,10000);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const fmtNum = (n) => (Math.round(n*10)/10).toFixed(1);
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+/* ============================================================
+   DOCUMENTOS LEGAIS
+   ============================================================ */
+const LEGAL = {
+  terms: {
+    title: "Termos de Uso — " + BRAND.full,
+    html: `
+      <p><strong>Última atualização:</strong> ${new Date().toLocaleDateString("pt-BR")}</p>
+      <p>${COPYRIGHT}</p>
+      <h3>1. Objeto</h3>
+      <p>O <strong>${BRAND.full}</strong> é uma ferramenta web de apoio à escrita e à análise de redações. Quando habilitada, a análise utiliza IA generativa por meio de serviço externo acessado via servidor seguro. O modo local utiliza indicadores textuais no navegador. Nenhum resultado substitui a correção humana.</p>
+      <h3>2. Uso permitido</h3>
+      <ul><li>Uso pessoal e educacional, por estudantes e professores.</li>
+      <li>Proibição de uso para fraude acadêmica, plágio ou submissão de conteúdo gerado como se fosse de autoria humana sem a devida transparência.</li></ul>
+      <h3>3. Limitações</h3>
+      <p>O sistema pode conter erros, imprecisões e indisponibilidades. Não há garantia de adequação a finalidades específicas. O resultado da análise deve ser revisado por um humano antes de qualquer uso avaliativo oficial.</p>
+      <h3>4. Propriedade intelectual</h3>
+      <p>O código, a marca, a logomarca, a interface e os textos do ${BRAND.full} pertencem a Nailson Lima. É vedada a reprodução sem autorização, salvo uso pessoal de estudo.</p>
+      <h3>5. Isenção de responsabilidade</h3>
+      <p>O autor não se responsabiliza por decisões tomadas com base nas saídas do sistema, nem por perdas decorrentes do uso da ferramenta.</p>
+      <h3>6. Foro</h3>
+      <p>Eventuais controvérsias serão resolvidas conforme a legislação brasileira aplicável.</p>
+    `
+  },
+  privacy: {
+    title: "Política de Privacidade — " + BRAND.full,
+    html: `
+      <p><strong>Última atualização:</strong> ${new Date().toLocaleDateString("pt-BR")}</p>
+      <p>${COPYRIGHT}</p>
+      <h3>1. Dados coletados</h3>
+      <p>Quando o login Google é utilizado, nome, e-mail e identificador da conta são tratados pelo Supabase Auth. Quando a análise por IA é utilizada, o texto, tema e rubrica são enviados ao Supabase e encaminhados à OpenAI para gerar a devolutiva. O histórico permanece no <code>localStorage</code> deste dispositivo:</p>
+      <ul><li>Dados básicos da conta Google (nome e e-mail), quando o login social é utilizado.</li>
+      <li>Textos, tema, rubrica e resultados enviados à IA quando a função estiver habilitada.</li>
+      <li>Histórico local e data de aceite dos termos.</li></ul>
+      <h3>2. Finalidade</h3>
+      <p>Para autenticação e fornecimento da análise. Quando a IA é utilizada, os dados da redação são processados pela Supabase e OpenAI conforme os termos e políticas desses provedores. Não venda dados pessoais. Publique prazos de retenção, base legal, contato do controlador e procedimento para exercício dos direitos do titular antes da produção.</p>
+      <h3>3. Base legal (LGPD)</h3>
+      <p>Consentimento do titular, manifestado pelo aceite no login.</p>
+      <h3>4. Seus direitos</h3>
+      <ul><li>Excluir todos os dados a qualquer momento: botão "Limpar histórico" ou limpar o <code>localStorage</code> do navegador.</li>
+      <li>Revogar o consentimento: basta não aceitar os termos ou limpar os dados.</li></ul>
+      <h3>5. Segurança</h3>
+      <p>O acesso à função de IA exige sessão autenticada e a chave do provedor fica no servidor. Ainda assim, a segurança depende da configuração do projeto e dos provedores. Configure controles de acesso, retenção mínima, contratos aplicáveis e medidas adequadas à LGPD antes da produção.</p>
+      <h3>6. Contato</h3>
+      <p>Responsável: Nailson Lima. Para exercer direitos, utilize os canais oficiais de contato do projeto.</p>
+    `
+  }
+};
+function openLegal(kind){
+  const doc = LEGAL[kind];
+  if (!doc) return;
+  $("legal-title").textContent = doc.title;
+  $("legalContent").innerHTML = doc.html;
+  show("screen-legal");
+  setTimeout(() => $("legal-title").focus?.(), 50);
+}
+document.querySelectorAll('[data-legal]').forEach(a => {
+  a.addEventListener("click", (e) => { e.preventDefault(); openLegal(a.dataset.legal); });
+});
+$("btnBackFromLegal").addEventListener("click", () => {
+  if (state.user) show("screen-editor"); else show("screen-login");
+});
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+$("acceptTerms").addEventListener("change", () => {
+  $("btnLogin").disabled = !$("acceptTerms").checked;
+});
+let supabaseClient = null;
+let authSession = null;
+const supabaseConfigured = () => window.supabase?.createClient
+  && /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(LIMA_CONFIG.supabaseUrl)
+  && !LIMA_CONFIG.supabaseUrl.includes("SEU-PROJETO")
+  && LIMA_CONFIG.supabaseAnonKey && !LIMA_CONFIG.supabaseAnonKey.includes("SUA_CHAVE");
+
+if (supabaseConfigured()) {
+  supabaseClient = window.supabase.createClient(LIMA_CONFIG.supabaseUrl, LIMA_CONFIG.supabaseAnonKey, {
+    auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:"pkce" }
+  });
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    authSession = session;
+    if (session?.user) {
+      const u = session.user;
+      state.user = { id:u.id, name:(u.user_metadata?.full_name || u.user_metadata?.name || u.email || "Usuário").slice(0,80),
+        email:u.email || "", role:"student", provider:"google" };
+      state.termsAcceptedAt = state.termsAcceptedAt || new Date().toISOString();
+      saveState(); renderUser();
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") show("screen-editor");
+    } else if (event === "SIGNED_OUT") {
+      state.user = null; saveState(); renderUser(); show("screen-login");
+    }
+  });
+  supabaseClient.auth.getSession().then(({data}) => {
+    authSession = data.session;
+    if (data.session?.user) {
+      const u=data.session.user;
+      state.user={id:u.id,name:(u.user_metadata?.full_name||u.user_metadata?.name||u.email||"Usuário").slice(0,80),email:u.email||"",role:"student",provider:"google"};
+      saveState(); renderUser(); show("screen-editor");
+    }
+  });
+} else {
+  $("authStatus").textContent = "Supabase ainda não configurado. O modo local permanece disponível.";
+  $("btnGoogleLogin").disabled = true;
+  $("btnGoogleLogin").title = "Configure LIMA_CONFIG para habilitar o Google.";
+}
+$("btnGoogleLogin").addEventListener("click", async () => {
+  if (!$("acceptTerms").checked) { alert("Aceite os Termos de Uso e a Política de Privacidade para continuar."); return; }
+  if (!supabaseClient) { alert("Configure a URL e a chave publicável do Supabase no arquivo."); return; }
+  $("btnGoogleLogin").disabled = true;
+  $("authStatus").textContent = "Redirecionando para autenticação Google…";
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider:"google",
+    options:{ redirectTo:window.location.href.split("#")[0], queryParams:{ access_type:"offline", prompt:"select_account" } }
+  });
+  if (error) { $("authStatus").textContent = "Falha no login: " + error.message; $("btnGoogleLogin").disabled=false; }
+});
+$("btnLogin").addEventListener("click", () => {
+  if (!$("acceptTerms").checked) return;
+  const name = $("loginName").value.trim() || ($("loginRole").value === "teacher" ? "Professor(a)" : "Estudante");
+  state.user = { name:name.slice(0,80), role:$("loginRole").value, provider:"local" };
+  state.termsAcceptedAt = new Date().toISOString();
+  saveState(); renderUser(); show("screen-editor"); renderRubricOptions();
+});
+function renderUser(){
+  const el = $("userInfo");
+  if (state.user) {
+    const method = state.user.provider === "google" ? "Google" : "modo local";
+    el.innerHTML = 'Olá, <strong>' + escapeHtml(state.user.name) + '</strong> · ' + method +
+      ' <button type="button" class="link-btn" id="btnLogout" style="margin-left:8px;">Sair</button>';
+    $("btnLogout")?.addEventListener("click", async () => {
+      if (supabaseClient && authSession) await supabaseClient.auth.signOut();
+      else { state.user=null; saveState(); renderUser(); show("screen-login"); }
+    });
+  } else el.textContent = "Desconectado";
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+const tabs = Array.from(document.querySelectorAll(".tab"));
+function activateTab(tab){
+  tabs.forEach(t => {
+    const on = t === tab;
+    t.classList.toggle("active", on);
+    t.setAttribute("aria-selected", on ? "true" : "false");
+    t.tabIndex = on ? 0 : -1;
+  });
+  $("pane-editor").classList.toggle("hidden", tab.dataset.tab !== "editor");
+  $("pane-upload").classList.toggle("hidden", tab.dataset.tab !== "upload");
+}
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => activateTab(tab));
+  tab.addEventListener("keydown", (e) => {
+    const i = tabs.indexOf(tab);
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); const j=(i+1)%tabs.length; tabs[j].focus(); activateTab(tabs[j]); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); const j=(i-1+tabs.length)%tabs.length; tabs[j].focus(); activateTab(tabs[j]); }
+    else if (e.key === "Home") { e.preventDefault(); tabs[0].focus(); activateTab(tabs[0]); }
+    else if (e.key === "End") { e.preventDefault(); tabs[tabs.length-1].focus(); activateTab(tabs[tabs.length-1]); }
+  });
+});
+
+/* ============================================================
+   RUBRICAS
+   ============================================================ */
+function renderRubricOptions(){
+  const sel = $("rubric"); sel.innerHTML = "";
+  state.rubrics.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r.id; opt.textContent = r.name; sel.appendChild(opt);
+  });
+  updateRubricInfo();
+}
+$("rubric").addEventListener("change", updateRubricInfo);
+function updateRubricInfo(){
+  const r = state.rubrics.find(x => x.id === $("rubric").value);
+  if (!r) { $("rubricInfo").textContent = ""; return; }
+  const total = r.criteria.reduce((a,c) => a + c.weight, 0);
+  $("rubricInfo").textContent = r.criteria.length + " critérios · soma dos pesos: " + total.toFixed(2);
+}
+
+/* ============================================================
+   CONTADORES
+   ============================================================ */
+function updateEssayMetrics(){
+  const value = $("essay").value;
+  const words = value.trim() ? value.trim().split(/\s+/).length : 0;
+  $("charCount").textContent = value.length.toLocaleString("pt-BR");
+  $("wordCountLive").textContent = words.toLocaleString("pt-BR");
+}
+function saveDraft(){
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ text:$("essay").value, theme:$("theme").value, format:$("fmt").value, updatedAt:new Date().toISOString() }));
+    $("draftStatus").textContent = "Rascunho salvo automaticamente neste navegador.";
+  } catch(e) { $("draftStatus").textContent = "Não foi possível salvar o rascunho. Exporte seu texto para evitar perdas."; }
+}
+$("essay").addEventListener("input", () => {
+  if ($("essay").value.length > 10000) $("essay").value = $("essay").value.slice(0,10000);
+  updateEssayMetrics(); saveDraft();
+});
+$("theme").addEventListener("input", saveDraft);
+$("fmt").addEventListener("change", saveDraft);
+try {
+  const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+  if (draft && typeof draft.text === "string" && !$("essay").value) {
+    $("essay").value = draft.text.slice(0,10000);
+    $("theme").value = typeof draft.theme === "string" ? draft.theme.slice(0,120) : "";
+    if (["dissertativa-argumentativa","dissertativa","narrativa","descritiva"].includes(draft.format)) $("fmt").value = draft.format;
+    updateEssayMetrics();
+  }
+} catch(e) { console.warn("Rascunho anterior indisponível", e); }
+$("uploadedText").addEventListener("input", () => {
+  if ($("uploadedText").value.length > 10000) $("uploadedText").value = $("uploadedText").value.slice(0,10000);
+});
+
+/* ============================================================
+   GERAR RASCUNHO
+   ============================================================ */
+$("btnClearDraft").addEventListener("click", () => {
+  if (!confirm("Apagar o texto e o tema deste rascunho? O histórico de avaliações será mantido.")) return;
+  $("essay").value = ""; $("theme").value = "";
+  try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
+  updateEssayMetrics(); $("draftStatus").textContent = "Rascunho apagado deste navegador.";
+});
+
+$("btnGenerate").addEventListener("click", () => {
+  if ($("essay").value.trim() && !confirm("Substituir o texto atual pelo rascunho de exemplo?")) return;
+  const fmt = $("fmt").value;
+  const theme = ($("theme").value.trim() || "desafios contemporâneos da sociedade brasileira").slice(0,120);
+  const exemplos = {
+    "dissertativa-argumentativa":
+`A questão dos ${theme} constitui um desafio que exige análise cuidadosa. Em primeiro lugar, é fundamental compreender que esse problema não se resolve apenas com medidas pontuais, mas com políticas públicas estruturadas e participação social.\n\nPor um lado, a ausência de investimento adequado agrava o cenário e perpetua desigualdades. Por outro, iniciativas locais demonstram que é possível transformar a realidade quando há articulação entre poder público e comunidade.\n\nPortanto, faz-se necessária a implementação de programas integrados, com metas mensuráveis, acompanhamento transparente e ampla divulgação. Dessa forma, será possível construir uma sociedade mais justa e preparada para os desafios do presente.`,
+    "dissertativa":
+`Os ${theme} representam um tema central para o debate contemporâneo. A análise desse fenômeno revela dimensões econômicas, sociais e culturais que se entrelaçam.\n\nCompreender essas dimensões exige olhar atento para as desigualdades existentes e para as possibilidades de superação. A educação, nesse contexto, ocupa papel estratégico.`,
+    "narrativa":
+`O sol nascia quando Marina percebeu que algo havia mudado. As ruas, antes vazias, agora pulsavam com vozes e passos apressados. Ela caminhou até a praça central, onde uma multidão se reunia em torno de um pequeno palco improvisado.\n\n— Precisamos começar por algum lugar — disse alguém ao microfone.\n\nMarina sorriu. Pela primeira vez em anos, sentiu que o futuro era possível.`,
+    "descritiva":
+`A cidade se estendia diante dos olhos como um mosaico de luzes e sombras. Telhados antigos se misturavam a prédios de vidro, e o cheiro de pão quente escapava das padarias. Nas calçadas, pessoas de todos os tipos cruzavam caminhos, cada uma carregando suas histórias.`
+  };
+  $("essay").value = exemplos[fmt] || exemplos["dissertativa-argumentativa"];
+  $("essay").dispatchEvent(new Event("input"));
+});
+
+/* ============================================================
+   UPLOAD + EXTRAÇÃO (com OCR)
+   ============================================================ */
+const dropzone = $("dropzone");
+const fileInput = $("fileInput");
+dropzone.addEventListener("click", () => fileInput.click());
+dropzone.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+});
+["dragenter","dragover"].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add("over"); }));
+["dragleave","drop"].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove("over"); }));
+dropzone.addEventListener("drop", e => {
+  const f = e.dataTransfer.files[0]; if (f) handleFile(f);
+});
+fileInput.addEventListener("change", e => {
+  const f = e.target.files[0]; if (f) handleFile(f);
+});
+
+function setUploadStatus(html){ $("uploadStatus").innerHTML = html; }
+
+async function handleFile(file){
+  setUploadStatus("");
+  $("uploadedText").value = "";
+  $("uploadedMeta").textContent = "";
+  const MAX = 5 * 1024 * 1024;
+  if (file.size > MAX) {
+    setUploadStatus('<div class="alert err">Arquivo maior que 5 MB. Envie um arquivo menor.</div>');
+    return;
+  }
+  const name = sanitizeFileName(file.name).toLowerCase();
+  const ext = name.split(".").pop();
+  const supported = ["txt","docx","pdf","png","jpg","jpeg"];
+  if (!supported.includes(ext)) {
+    setUploadStatus('<div class="alert err">Formato não suportado. Use TXT, DOCX, PDF, PNG ou JPG.</div>');
+    return;
+  }
+  setUploadStatus('<div class="alert warn">Processando <strong>' + escapeHtml(sanitizeFileName(file.name)) + '</strong>…</div>');
+  try {
+    let text = "";
+    let usedOcr = false;
+
+    if (ext === "txt") {
+      text = await readTxt(file);
+    } else if (ext === "docx") {
+      text = await readDocx(file);
+    } else if (ext === "pdf") {
+      const result = await readPdfWithFallbackOcr(file);
+      text = result.text;
+      usedOcr = result.usedOcr;
+    } else if (["png","jpg","jpeg"].includes(ext)) {
+      text = await readImageWithOcr(file);
+      usedOcr = true;
+    }
+
+    text = sanitizeText(text).trim();
+    if (!text) {
+      setUploadStatus('<div class="alert err">Não foi possível extrair texto do arquivo. Verifique se a imagem/PDF tem conteúdo legível.</div>');
+      return;
+    }
+    $("uploadedText").value = text;
+    const meta = text.length.toLocaleString("pt-BR") + " caracteres extraídos · " + sanitizeFileName(file.name) + (usedOcr ? " · OCR aplicado" : "");
+    $("uploadedMeta").textContent = meta;
+    setUploadStatus('<div class="alert ok">Arquivo processado' + (usedOcr ? ' com OCR' : '') + '. Revise o texto extraído antes de analisar.</div>');
+  } catch (err) {
+    console.error(err);
+    setUploadStatus('<div class="alert err">Falha ao processar o arquivo: ' + escapeHtml(err.message || "erro desconhecido") + '.</div>');
+  }
+}
+
+function readTxt(file){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result || ""));
+    r.onerror = () => reject(new Error("leitura do TXT falhou"));
+    r.readAsText(file, "UTF-8");
+  });
+}
+
+async function readDocx(file){
+  if (typeof DecompressionStream === "undefined") {
+    throw new Error("navegador sem suporte a DecompressionStream — use navegador moderno");
+  }
+  const buf = await file.arrayBuffer();
+  const entries = parseZip(buf);
+  const doc = entries.find(e => e.name === "word/document.xml");
+  if (!doc) throw new Error("document.xml não encontrado no DOCX");
+  const xmlBytes = await inflateRaw(doc.compressedData, doc.method);
+  const xml = new TextDecoder("UTF-8").decode(xmlBytes);
+  return docxXmlToText(xml);
+}
+
+function docxXmlToText(xml){
+  const paragraphs = xml.split(/<w:p[ >]/).slice(1);
+  const out = paragraphs.map(p => {
+    const texts = Array.from(p.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)).map(m => m[1]);
+    return texts.join("");
+  }).filter(t => t.trim() !== "");
+  return out.join("\n\n");
+}
+
+async function readPdfWithFallbackOcr(file){
+  if (!window.pdfjsLib) {
+    throw new Error("PDF.js não carregou (sem internet?). O processamento de PDF depende do carregamento da biblioteca externa.");
+  }
+  const buf = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+
+  let nativeText = "";
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    nativeText += content.items.map(it => it.str).join(" ") + "\n\n";
+  }
+  nativeText = nativeText.replace(/\s+/g, " ").trim();
+
+  const minCharsPerPage = 50;
+  if (nativeText.length >= pdf.numPages * minCharsPerPage) {
+    return { text: nativeText, usedOcr: false };
+  }
+
+  if (!window.Tesseract) {
+    throw new Error("PDF parece escaneado, mas Tesseract.js não carregou (sem internet?). OCR indisponível.");
+  }
+  setUploadStatus('<div class="alert warn">PDF escaneado detectado. Aplicando OCR (pode demorar)…</div>');
+  const text = await ocrPdf(pdf);
+  return { text, usedOcr: true };
+}
+
+async function ocrPdf(pdf){
+  const worker = await Tesseract.createWorker("por");
+  let fullText = "";
+  try {
+    for (let i = 1; i <= pdf.numPages; i++) {
+      setUploadStatus('<div class="alert warn">OCR na página ' + i + ' de ' + pdf.numPages + '…</div>');
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 2.0 });
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const { data: { text } } = await worker.recognize(canvas);
+      fullText += text + "\n\n";
+    }
+  } finally {
+    await worker.terminate();
+  }
+  return fullText;
+}
+
+async function readImageWithOcr(file){
+  if (!window.Tesseract) {
+    throw new Error("Tesseract.js não carregou (sem internet?). OCR indisponível.");
+  }
+  setUploadStatus('<div class="alert warn">Aplicando OCR na imagem…</div>');
+  const worker = await Tesseract.createWorker("por");
+  try {
+    const url = URL.createObjectURL(file);
+    const { data: { text } } = await worker.recognize(url);
+    URL.revokeObjectURL(url);
+    return text;
+  } finally {
+    await worker.terminate();
+  }
+}
+
+function parseZip(arrayBuffer){
+  const bytes = new Uint8Array(arrayBuffer);
+  const dv = new DataView(arrayBuffer);
+  const entries = [];
+  let eocd = -1;
+  for (let i = bytes.length - 22; i >= 0 && i >= bytes.length - 65558; i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("ZIP inválido (EOCD não encontrado)");
+  const cdOffset = dv.getUint32(eocd + 16, true);
+  const cdCount = dv.getUint16(eocd + 10, true);
+  let p = cdOffset;
+  for (let i = 0; i < cdCount; i++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const compMethod = dv.getUint16(p + 10, true);
+    const compSize = dv.getUint32(p + 20, true);
+    const nameLen = dv.getUint16(p + 28, true);
+    const extraLen = dv.getUint16(p + 30, true);
+    const commentLen = dv.getUint16(p + 32, true);
+    const localOffset = dv.getUint32(p + 42, true);
+    const name = new TextDecoder("UTF-8").decode(bytes.slice(p + 46, p + 46 + nameLen));
+    if (dv.getUint32(localOffset, true) !== 0x04034b50) throw new Error("Local header inválido em " + name);
+    const lNameLen = dv.getUint16(localOffset + 26, true);
+    const lExtraLen = dv.getUint16(localOffset + 28, true);
+    const dataStart = localOffset + 30 + lNameLen + lExtraLen;
+    const compressedData = bytes.slice(dataStart, dataStart + compSize);
+    entries.push({ name, method: compMethod, compressedData });
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+  return entries;
+}
+
+async function inflateRaw(data, method){
+  if (method === 0) return data;
+  if (method !== 8) throw new Error("Método de compressão não suportado: " + method);
+  const ds = new DecompressionStream("deflate-raw");
+  const stream = new Blob([data]).stream().pipeThrough(ds);
+  const buf = await new Response(stream).arrayBuffer();
+  return new Uint8Array(buf);
+}
+
+/* ============================================================
+   MOTOR DE ANÁLISE TEXTUAL LOCAL
+   ============================================================ */
+function analyzeText(text, rubric, format){
+  const clean = text.replace(/\s+/g, " ").trim();
+  const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+  const words = clean ? clean.split(/\s+/) : [];
+  const sentences = clean.split(/[.!?]+/).map(s => s.trim()).filter(Boolean);
+  const wordCount = words.length;
+  const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/[^\wÀ-ÿ]/g, "")));
+  const lexicalDiversity = wordCount ? uniqueWords.size / wordCount : 0;
+  const avgSentenceLen = sentences.length ? wordCount / sentences.length : 0;
+  const hasConnectives = /\b(portanto|assim|além disso|por outro lado|em primeiro lugar|dessa forma|contudo|entretanto|logo|pois|porque)\b/i.test(clean);
+  const hasProposal = /\b(propõe|propõe-se|faz-se necess[áa]rio|recomenda-se|sugere-se|implementa[çc][ãa]o|pol[íi]tica p[úu]blica|programa)\b/i.test(clean);
+  const hasNarrative = /\b(disse|percebeu|caminhou|sorriu|olhou|sentiu|ent[ãa]o|depois)\b/i.test(clean);
+
+  const baseScore = Math.min(100, 30 + wordCount / 5 + paragraphs.length * 4);
+  const criteriaScores = rubric.criteria.map(c => {
+    let s = baseScore;
+    const n = c.name.toLowerCase();
+    if (n.includes("norma") || n.includes("gram") || n.includes("linguagem")) s = baseScore - (avgSentenceLen > 40 ? 10 : 0);
+    if (n.includes("tema") || n.includes("compreens")) s = hasNarrative || hasProposal || wordCount >= 100 ? baseScore : baseScore - 20;
+    if (n.includes("argument")) s = hasConnectives ? baseScore : baseScore - 12;
+    if (n.includes("coes") || n.includes("coer")) s = hasConnectives ? baseScore : baseScore - 15;
+    if (n.includes("interven") || n.includes("proposta")) s = hasProposal ? baseScore : baseScore - 25;
+    if (n.includes("narrativ") || n.includes("estrutura")) s = hasNarrative || wordCount >= 100 ? baseScore : baseScore - 18;
+    if (n.includes("criativ")) s = lexicalDiversity > 0.4 ? baseScore : baseScore - 10;
+    return { name: c.name, weight: c.weight, description: c.description, score: Math.max(0, Math.min(100, s)) };
+  });
+
+  const weightTotal = criteriaScores.reduce((a, c) => a + c.weight, 0);
+  const total = weightTotal > 0 ? criteriaScores.reduce((a, c) => a + (c.score * c.weight), 0) / weightTotal : 0;
+  const score = Math.max(0, Math.min(100, total));
+
+  const strengths = [];
+  const weaknesses = [];
+  if (paragraphs.length >= 3) strengths.push({ titulo: "Estrutura em parágrafos", trecho: paragraphs[0].slice(0, 120) + "…", motivo: "Texto organizado em blocos, o que favorece a progressão." });
+  if (hasConnectives) strengths.push({ titulo: "Uso de conectivos", trecho: (clean.match(/\b(portanto|assim|além disso|por outro lado|dessa forma)\b/i) || [""])[0], motivo: "Marcadores de coesão presentes." });
+  if (hasProposal && format !== "narrativa") strengths.push({ titulo: "Proposta de intervenção", trecho: "…", motivo: "Apresenta encaminhamento de solução." });
+  if (wordCount >= 150) strengths.push({ titulo: "Desenvolvimento", trecho: "", motivo: "Extensão adequada para o formato." });
+  if (strengths.length === 0) strengths.push({ titulo: "Base inicial", trecho: "", motivo: "Texto existe; há espaço para desenvolver os critérios." });
+
+  if (wordCount < 80) weaknesses.push({ titulo: "Extensão insuficiente", trecho: "", motivo: "Menos de 80 palavras.", sugestao: "Desenvolva cada parágrafo com exemplos e justificativas." });
+  if (paragraphs.length < 2) weaknesses.push({ titulo: "Paragrafação", trecho: "", motivo: "Bloco único.", sugestao: "Divida em introdução, desenvolvimento e conclusão." });
+  if (!hasConnectives) weaknesses.push({ titulo: "Coesão", trecho: "", motivo: "Ausência de conectivos.", sugestao: "Use 'portanto', 'além disso', 'por outro lado'." });
+  if (format === "dissertativa-argumentativa" && !hasProposal) weaknesses.push({ titulo: "Proposta ausente", trecho: "", motivo: "Não há intervenção.", sugestao: "Indique agente, ação, meio e finalidade." });
+  if (weaknesses.length === 0) weaknesses.push({ titulo: "Refinamento", trecho: "", motivo: "Sem falhas críticas detectadas.", sugestao: "Revise estilo e precisão vocabular." });
+
+  const suggestions = [];
+  if (!hasConnectives) suggestions.push("Introduza conectivos entre parágrafos e frases.");
+  if (format === "dissertativa-argumentativa" && !hasProposal) suggestions.push("Inclua proposta de intervenção com agente, ação, meio e finalidade.");
+  if (avgSentenceLen > 40) suggestions.push("Reduza o tamanho médio das frases para melhorar a clareza.");
+  if (lexicalDiversity < 0.35 && wordCount > 60) suggestions.push("Amplie o vocabulário para evitar repetições.");
+  if (suggestions.length === 0) suggestions.push("Texto consistente; refine a originalidade e a precisão dos exemplos.");
+
+  return { score: Math.round(score*10)/10, criteria: criteriaScores, strengths, weaknesses, suggestions, wordCount, paragraphs: paragraphs.length };
+}
+
+/* ============================================================
+   AVALIAÇÃO + RESULTADO
+   ============================================================ */
+let currentEvaluation = null;
+
+async function evaluateEssay(text, source){
+  const clean = sanitizeText(text).trim();
+  if (!clean || clean.length < 20) { alert("Texto muito curto para analisar (mínimo 20 caracteres)."); return; }
+  const rubric = state.rubrics.find(r => r.id === $("rubric").value) || state.rubrics[0];
+  const format = source === "editor" ? $("fmt").value : "dissertativa-argumentativa";
+  const theme = source === "editor" ? $("theme").value.trim().slice(0,120) : "";
+  const buttons = [$("btnEvaluateEditor"), $("btnEvaluateUpload")];
+  buttons.forEach(b => { if (b) b.disabled=true; });
+  const previousLabels = buttons.map(b => b?.textContent);
+  buttons.forEach(b => { if (b) b.textContent="⏳ Analisando…"; });
+  try {
+    let result, engine = "local";
+    if (supabaseClient && authSession?.access_token && state.user?.provider === "google") {
+      const { data, error } = await supabaseClient.functions.invoke(LIMA_CONFIG.aiFunctionName, {
+        body:{ essay:clean, theme, format, rubric:{name:rubric.name,criteria:rubric.criteria} }
+      });
+      if (error) throw new Error(error.message || "Não foi possível acessar o serviço de IA.");
+      if (!data || !Array.isArray(data.criteria) || typeof data.score !== "number") throw new Error("Resposta da IA inválida.");
+      result = data; engine = "openai";
+    } else {
+      result = analyzeText(clean, rubric, format);
+    }
+    currentEvaluation = {
+      id:uid(), createdAt:new Date().toISOString(),
+      userName:state.user ? state.user.name : "Anônimo",
+      userRole:state.user ? state.user.role : "student",
+      source, format, theme, rubricId:rubric.id, rubricName:rubric.name,
+      text:clean, score:result.score, criteria:result.criteria,
+      strengths:result.strengths || [], weaknesses:result.weaknesses || [],
+      suggestions:result.suggestions || [], wordCount:result.wordCount ?? clean.split(/\\s+/).filter(Boolean).length,
+      paragraphs:result.paragraphs ?? clean.split(/\\n{2,}/).filter(x=>x.trim()).length,
+      engine, aiReview:engine==="openai" ? {
+        overallFeedback:result.overallFeedback, thesis:result.thesis,
+        argumentation:result.argumentation, language:result.language,
+        intervention:result.intervention, nextSteps:result.nextSteps || []
+      } : null,
+      teacherScore:null, teacherComment:null
+    };
+    renderResult(currentEvaluation);
+    show("screen-result");
+  } catch (err) {
+    console.error("Falha na avaliação por IA:",err);
+    alert("Não foi possível concluir a avaliação por IA: " + (err.message || "erro desconhecido") +
+      "\\n\\nVerifique o login Google, a implantação da Edge Function e os Secrets do Supabase. Nenhuma nota de IA foi inventada.");
+  } finally {
+    buttons.forEach((b,i) => { if (b) { b.disabled=false; b.textContent=previousLabels[i] || "Analisar redação"; } });
+  }
+}
+
+function renderResult(ev){
+  currentEvaluation = ev;
+  const nota = ev.teacherScore != null ? ev.teacherScore : ev.score;
+  $("scoreValue").textContent = fmtNum(nota) + " de 100";
+  $("scoreBar").style.width = nota + "%";
+  $("resFormat").textContent = ev.format;
+  $("resSource").textContent = ev.source === "editor" ? "Editor" : "Upload";
+  $("resRubric").textContent = ev.rubricName;
+  const themeLine = $("resTheme"); if (themeLine) themeLine.textContent = ev.theme || "Não informado";
+  $("aiDisclaimer").textContent = (ev.engine === "openai"
+    ? "Análise com IA generativa (OpenAI), estruturada por rubrica e evidências textuais"
+    : "Análise local heurística — não equivale a uma correção por IA generativa") +
+    " em " + new Date(ev.createdAt).toLocaleString("pt-BR") + ". Revisão humana recomendada.";
+  const deep = $("aiDeepReview"), deepContent = $("aiDeepReviewContent");
+  if (ev.aiReview) {
+    deep.hidden = false; deepContent.replaceChildren();
+    const blocks = [
+      ["Síntese geral",ev.aiReview.overallFeedback],["Tese e atendimento ao tema",ev.aiReview.thesis],
+      ["Argumentação e repertório",ev.aiReview.argumentation],["Linguagem e norma-padrão",ev.aiReview.language],
+      ["Proposta de intervenção",ev.aiReview.intervention]
+    ];
+    blocks.forEach(([heading,body]) => {
+      if (!body) return;
+      const section=document.createElement("section");
+      const h=document.createElement("h3"); h.textContent=heading;
+      const p=document.createElement("p"); p.textContent=body;
+      section.append(h,p); deepContent.append(section);
+    });
+    if (ev.aiReview.nextSteps?.length) {
+      const h=document.createElement("h3"); h.textContent="Plano de revisão prioritário"; deepContent.append(h);
+      const ol=document.createElement("ol");
+      ev.aiReview.nextSteps.forEach(item=>{const li=document.createElement("li");li.textContent=item;ol.append(li);});
+      deepContent.append(ol);
+    }
+  } else { deep.hidden=true; deepContent.replaceChildren(); }
+
+  const crit = $("criteriaList"); crit.innerHTML = "";
+  ev.criteria.forEach(c => {
+    const wrap = document.createElement("div"); wrap.className = "crit";
+    wrap.innerHTML =
+      '<div class="crit-head"><span><strong>' + escapeHtml(c.name) + '</strong> · peso ' + c.weight.toFixed(2) +
+      '</span><span>' + fmtNum(c.score) + '/100</span></div>' +
+      '<div class="bar" aria-hidden="true"><i style="width:' + c.score + '%"></i></div>' +
+      '<div class="muted">' + escapeHtml(c.description) + '</div>';
+    crit.appendChild(wrap);
+  });
+
+  const st = $("strengthsList"); st.innerHTML = "";
+  if (!ev.strengths.length) st.innerHTML = '<p class="muted">Nenhum ponto forte detectado.</p>';
+  ev.strengths.forEach(s => {
+    const d = document.createElement("div"); d.className = "strength";
+    d.innerHTML = '<strong>' + escapeHtml(s.titulo) + '</strong>' + escapeHtml(s.motivo) +
+      (s.trecho ? '<div class="quote">"' + escapeHtml(s.trecho) + '"</div>' : "");
+    st.appendChild(d);
+  });
+
+  const wk = $("weaknessesList"); wk.innerHTML = "";
+  if (!ev.weaknesses.length) wk.innerHTML = '<p class="muted">Nenhum ponto fraco detectado.</p>';
+  ev.weaknesses.forEach(w => {
+    const d = document.createElement("div"); d.className = "weakness";
+    d.innerHTML = '<strong>' + escapeHtml(w.titulo) + '</strong>' + escapeHtml(w.motivo) +
+      (w.sugestao ? '<div class="quote">Sugestão: ' + escapeHtml(w.sugestao) + '</div>' : "");
+    wk.appendChild(d);
+  });
+
+  const sg = $("suggestionsList"); sg.innerHTML = "";
+  ev.suggestions.forEach(s => {
+    const d = document.createElement("div"); d.className = "suggestion";
+    d.innerHTML = '<strong>Sugestão</strong>' + escapeHtml(s);
+    sg.appendChild(d);
+  });
+
+  const tc = $("teacherCard");
+  const isTeacher = state.user && state.user.role === "teacher";
+  tc.classList.toggle("hidden", !isTeacher);
+  if (isTeacher) {
+    $("teacherScore").value = ev.teacherScore != null ? ev.teacherScore : "";
+    $("teacherComment").value = ev.teacherComment || "";
+    $("teacherStatus").innerHTML = "";
+  }
+
+  // Cabeçalho de impressão com logomarca
+  $("printHeader").innerHTML =
+    '<svg class="print-logo" viewBox="0 0 380 100" aria-hidden="true"><use href="#lima-lockup"/></svg>' +
+    '<div class="muted">Resultado da análise · ' + escapeHtml(ev.format) + ' · ' +
+    new Date(ev.createdAt).toLocaleString("pt-BR") + '</div>' +
+    '<div class="muted">Usuário: ' + escapeHtml(ev.userName) + ' · Rubrica: ' + escapeHtml(ev.rubricName) + '</div>';
+}
+
+$("btnEvaluateEditor").addEventListener("click", () => evaluateEssay($("essay").value, "editor"));
+$("btnEvaluateUpload").addEventListener("click", () => evaluateEssay($("uploadedText").value, "upload"));
+
+/* ============================================================
+   REVISÃO DO PROFESSOR
+   ============================================================ */
+$("btnTeacherSave").addEventListener("click", () => {
+  if (!currentEvaluation) return;
+  if (!(state.user && state.user.role === "teacher")) return;
+  const raw = $("teacherScore").value.trim();
+  if (raw === "") { $("teacherStatus").innerHTML = '<div class="alert err">Informe uma nota.</div>'; return; }
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0 || n > 100) { $("teacherStatus").innerHTML = '<div class="alert err">Nota deve estar entre 0 e 100.</div>'; return; }
+  currentEvaluation.teacherScore = Math.round(n*10)/10;
+  currentEvaluation.teacherComment = $("teacherComment").value.slice(0,2000);
+  saveEvaluation(currentEvaluation);
+  renderResult(currentEvaluation);
+  $("teacherStatus").innerHTML = '<div class="alert ok">Revisão salva.</div>';
+});
+
+function saveEvaluation(ev){
+  const idx = state.evaluations.findIndex(e => e.id === ev.id);
+  if (idx >= 0) state.evaluations[idx] = ev;
+  else state.evaluations.push(ev);
+  saveState();
+}
+
+/* ============================================================
+   NAVEGAÇÃO
+   ============================================================ */
+$("btnBackEditor").addEventListener("click", () => show("screen-editor"));
+$("btnHistory").addEventListener("click", () => { renderHistory(); show("screen-history"); });
+$("btnBackFromHistory").addEventListener("click", () => {
+  if (currentEvaluation) show("screen-result"); else show("screen-editor");
+});
+$("btnClearHistory").addEventListener("click", () => {
+  if (!confirm("Remover todo o histórico local? Esta ação não pode ser desfeita.")) return;
+  state.evaluations = []; saveState(); renderHistory();
+});
+
+/* ============================================================
+   EXPORTAR MARKDOWN
+   ============================================================ */
+function evaluationToMarkdown(ev){
+  const linhas = [];
+  linhas.push("# " + BRAND.full + " — Resultado da análise");
+  linhas.push("");
+  linhas.push("**Data:** " + new Date(ev.createdAt).toLocaleString("pt-BR"));
+  linhas.push("**Usuário:** " + ev.userName + " (" + ev.userRole + ")");
+  linhas.push("**Formato:** " + ev.format);
+  if (ev.theme) linhas.push("**Tema:** " + ev.theme);
+  linhas.push("**Fonte:** " + (ev.source === "editor" ? "Editor" : "Upload"));
+  linhas.push("**Rubrica:** " + ev.rubricName);
+  linhas.push("");
+  linhas.push("## Nota: " + fmtNum(ev.teacherScore != null ? ev.teacherScore : ev.score) + "/100" +
+    (ev.teacherScore != null ? " (revisão do professor; IA: " + fmtNum(ev.score) + ")" : ""));
+  linhas.push("");
+  linhas.push("## Competências");
+  ev.criteria.forEach(c => linhas.push("- **" + c.name + "** (" + fmtNum(c.score) + "/100, peso " + c.weight.toFixed(2) + "): " + c.description));
+  linhas.push("");
+  linhas.push("## Pontos fortes");
+  ev.strengths.forEach(s => linhas.push("- **" + s.titulo + "** — " + s.motivo + (s.trecho ? " (\"" + s.trecho + "\")" : "")));
+  linhas.push("");
+  linhas.push("## Pontos a melhorar");
+  ev.weaknesses.forEach(w => linhas.push("- **" + w.titulo + "** — " + w.motivo + (w.sugestao ? " Sugestão: " + w.sugestao : "")));
+  linhas.push("");
+  linhas.push("## Sugestões");
+  ev.suggestions.forEach(s => linhas.push("- " + s));
+  if (ev.teacherComment) { linhas.push(""); linhas.push("## Comentário do professor"); linhas.push(ev.teacherComment); }
+  linhas.push("");
+  linhas.push("> Análise automatizada por indicadores textuais locais. Revisão humana recomendada.");
+  linhas.push("");
+  linhas.push("---");
+  linhas.push(COPYRIGHT);
+  return linhas.join("\n");
+}
+
+function baixarMarkdown(ev){
+  if (!ev) { alert("Nenhuma avaliação selecionada. Analise uma redação primeiro."); return; }
+  const md = evaluationToMarkdown(ev);
+  const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "lima-redator-" + ev.id + ".md";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+$("btnExportMD").addEventListener("click", () => baixarMarkdown(currentEvaluation));
+
+/* ============================================================
+   EXPORTAR PDF
+   ============================================================ */
+$("btnExportPDF").addEventListener("click", () => {
+  if (!currentEvaluation) { alert("Nenhuma avaliação selecionada. Analise uma redação primeiro."); return; }
+  if (!$("screen-result").classList.contains("active")) show("screen-result");
+  const originalTitle = document.title;
+  document.title = "Lima-Redator-" + (currentEvaluation ? currentEvaluation.id : "") + "-resultado";
+  window.print();
+  setTimeout(() => { document.title = originalTitle; }, 1500);
+});
+window.addEventListener("afterprint", () => {
+  document.title = "Lima — Redator Inteligente";
+});
+
+/* ============================================================
+   HISTÓRICO
+   ============================================================ */
+function renderHistory(){
+  const wrap = $("historyTableWrap");
+  if (!state.evaluations.length) {
+    wrap.innerHTML = '<p class="muted">Nenhuma avaliação registrada.</p>';
+    return;
+  }
+  const rows = state.evaluations.slice().sort((a,b) => b.createdAt.localeCompare(a.createdAt)).map(e => {
+    const nota = e.teacherScore != null ? fmtNum(e.teacherScore) + " (prof.)" : fmtNum(e.score) + " (IA)";
+    return '<tr>' +
+      '<td>' + new Date(e.createdAt).toLocaleString("pt-BR") + '</td>' +
+      '<td>' + escapeHtml(e.format) + '</td>' +
+      '<td>' + escapeHtml(e.source) + '</td>' +
+      '<td>' + escapeHtml(nota) + '</td>' +
+      '<td>' + escapeHtml(e.rubricName) + '</td>' +
+      '<td class="no-print" style="white-space:nowrap;">' +
+        '<button class="ghost small" data-act="view" data-id="' + e.id + '">Abrir</button> ' +
+        '<button class="ghost small" data-act="md" data-id="' + e.id + '">⬇️ MD</button> ' +
+        '<button class="ghost small" data-act="pdf" data-id="' + e.id + '">🖨️ PDF</button>' +
+      '</td>' +
+    '</tr>';
+  }).join("");
+  wrap.innerHTML = '<table><thead><tr><th>Data</th><th>Formato</th><th>Fonte</th><th>Nota</th><th>Rubrica</th><th class="no-print">Ações</th></tr></thead><tbody>' + rows + '</tbody></table>';
+
+  wrap.querySelectorAll('button[data-act]').forEach(btn => {
+    btn.addEventListener("click", () => {
+      const ev = state.evaluations.find(x => x.id === btn.dataset.id);
+      if (!ev) return;
+      if (btn.dataset.act === "md") return baixarMarkdown(ev);
+      if (btn.dataset.act === "pdf") {
+        currentEvaluation = ev;
+        renderResult(ev);
+        show("screen-result");
+        $("btnExportPDF").click();
+        return;
+      }
+      if (btn.dataset.act === "view") {
+        currentEvaluation = ev;
+        renderResult(ev);
+        show("screen-result");
+      }
+    });
+  });
+}
+
+/* ============================================================
+   INICIALIZAÇÃO
+   ============================================================ */
+(function init(){
+  renderUser();
+  renderRubricOptions();
+  updateRubricInfo();
+  if (state.user?.provider === "google" && !authSession) state.user = null;
+  if (state.user) {
+    $("acceptTerms").checked = true;
+    $("btnLogin").disabled = false;
+    show("screen-editor");
+  } else {
+    show("screen-login");
+  }
+})();
+</script>
+</body>
+</html>
