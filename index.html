@@ -410,9 +410,11 @@
         <input type="checkbox" id="acceptTerms" />
         <label for="acceptTerms">Li e aceito os <button class="link-btn" data-legal="terms">Termos de Uso</button> e a <button class="link-btn" data-legal="privacy">Política de Privacidade</button>.</label>
       </div>
-      
-      <div class="actions">
-        <button id="btnLogin" disabled style="width: 100%;">Entrar no Sistema</button>
+
+      <div id="authStatus" class="muted" role="status" aria-live="polite" style="margin:12px 0;">Marque o aceite dos termos para entrar com sua conta Google ou usar o modo local.</div>
+      <div class="actions" style="flex-direction:column;">
+        <button id="btnGoogleLogin" type="button" disabled style="width:100%;background:#fff;color:#1f2937;border:1px solid #cbd5e1;">Continuar com Google</button>
+        <button id="btnLogin" type="button" disabled class="secondary" style="width:100%;">Entrar no modo local</button>
       </div>
       
       <div class="disclaimer">
