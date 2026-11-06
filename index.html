@@ -735,7 +735,11 @@ if (supabaseConfigured()) {
   supabaseClient = window.supabase.createClient(LIMA_CONFIG.supabaseUrl, LIMA_CONFIG.supabaseAnonKey, {
     auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:"pkce" }
   });
-  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  // O evento INITIAL_SESSION só chega depois que o Supabase termina
+  // de recuperar/trocar o código OAuth e restaurar a sessão persistida.
+  // Mantemos um único fluxo de inicialização para evitar corrida entre
+  // getSession() e onAuthStateChange() na volta do Google.
+  supabaseClient.auth.onAuthStateChange((event, session) => {
     authSession = session;
     if (session?.user) {
       const u = session.user;
@@ -743,17 +747,9 @@ if (supabaseConfigured()) {
         email:u.email || "", role:"student", provider:"google" };
       state.termsAcceptedAt = state.termsAcceptedAt || new Date().toISOString();
       saveState(); renderUser();
-      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") show("screen-editor");
-    } else if (event === "SIGNED_OUT") {
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") show("screen-editor");
+    } else if (event === "INITIAL_SESSION" || event === "SIGNED_OUT") {
       state.user = null; saveState(); renderUser(); show("screen-login");
-    }
-  });
-  supabaseClient.auth.getSession().then(({data}) => {
-    authSession = data.session;
-    if (data.session?.user) {
-      const u=data.session.user;
-      state.user={id:u.id,name:(u.user_metadata?.full_name||u.user_metadata?.name||u.email||"Usuário").slice(0,80),email:u.email||"",role:"student",provider:"google"};
-      saveState(); renderUser(); show("screen-editor");
     }
   });
 } else {
@@ -1466,8 +1462,13 @@ function renderHistory(){
   renderUser();
   renderRubricOptions();
   updateRubricInfo();
-  if (state.user?.provider === "google" && !authSession) state.user = null;
-  if (state.user) {
+  if (supabaseClient && state.user?.provider === "google") {
+    // A sessão Google será validada pelo evento INITIAL_SESSION.
+    state.user = null;
+    saveState();
+    renderUser();
+    show("screen-login");
+  } else if (state.user) {
     $("acceptTerms").checked = true;
     $("btnLogin").disabled = false;
     show("screen-editor");
